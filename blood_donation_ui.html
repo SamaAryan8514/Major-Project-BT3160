@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blood Donation Management — MediCare HMS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  :root {
+    --green-50: #EAF3DE; --green-100: #C0DD97; --green-200: #97C459;
+    --green-400: #639922; --green-600: #3B6D11; --green-700: #2d5a0a; --green-800: #27500A;
+    --red-50: #FCEBEB; --red-100: #F7C1C1; --red-200: #F09595;
+    --red-400: #E24B4A; --red-600: #A32D2D; --red-800: #791F1F;
+    --amber-50: #FAEEDA; --amber-100: #FAC775; --amber-400: #BA7517; --amber-800: #633806;
+    --gray-50: #F1EFE8; --gray-100: #D3D1C7; --gray-200: #B4B2A9;
+    --gray-400: #888780; --gray-600: #5F5E5A; --gray-800: #2C2C2A;
+    --teal-50: #E1F5EE; --teal-100: #9FE1CB; --teal-400: #1D9E75; --teal-800: #04342C;
+    --bg: #f7faf4; --surface: #ffffff; --surface2: #f0f5eb;
+    --text: #1a2e12; --text2: #4a6540; --text3: #7a9b72;
+    --border: #d4e4c8; --border2: #b8d4a8;
+    --accent: #3B6D11; --accent-light: #EAF3DE; --accent-hover: #27500A;
+    --danger: #A32D2D; --danger-light: #FCEBEB;
+    --warning: #BA7517; --warning-light: #FAEEDA;
+    --info: #1D9E75; --info-light: #E1F5EE;
+    --radius: 10px; --radius-lg: 16px; --radius-xl: 24px;
+    --shadow: 0 1px 4px rgba(59,109,17,0.08), 0 4px 16px rgba(59,109,17,0.05);
+    --shadow-md: 0 4px 20px rgba(59,109,17,0.12);
+    --font: 'DM Sans', sans-serif; --mono: 'DM Mono', monospace;
+    --sidebar-w: 240px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; display: flex; font-size: 15px; }
+
+  /* ─── SIDEBAR ─── */
+  .sidebar {
+    width: var(--sidebar-w); min-height: 100vh; background: var(--surface);
+    border-right: 1px solid var(--border); display: flex; flex-direction: column;
+    position: fixed; left: 0; top: 0; bottom: 0; z-index: 100;
+  }
+  .sidebar-brand {
+    padding: 20px 20px 16px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .brand-icon {
+    width: 38px; height: 38px; background: linear-gradient(135deg, var(--accent) 0%, #639922 100%);
+    border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 17px;
+  }
+  .brand-text { line-height: 1.2; }
+  .brand-text .name { font-weight: 600; font-size: 14px; color: var(--text); }
+  .brand-text .sub { font-size: 11px; color: var(--text3); font-weight: 400; }
+
+  .sidebar-nav { flex: 1; padding: 12px 10px; overflow-y: auto; }
+  .nav-section { margin-bottom: 20px; }
+  .nav-section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; color: var(--text3); text-transform: uppercase; padding: 0 10px; margin-bottom: 4px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px;
+    cursor: pointer; color: var(--text2); font-size: 13.5px; font-weight: 400;
+    transition: all 0.15s; margin-bottom: 1px; border: none; background: none; width: 100%; text-align: left;
+  }
+  .nav-item:hover { background: var(--accent-light); color: var(--accent); }
+  .nav-item.active { background: var(--accent-light); color: var(--accent); font-weight: 500; }
+  .nav-item i { width: 18px; text-align: center; font-size: 15px; }
+  .nav-badge {
+    margin-left: auto; background: var(--red-50); color: var(--red-600);
+    font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 20px; min-width: 18px; text-align: center;
+  }
+  .sidebar-footer {
+    padding: 14px 16px; border-top: 1px solid var(--border);
+    font-size: 11.5px; color: var(--text3);
+  }
+  .back-btn {
+    display: flex; align-items: center; gap: 7px; color: var(--text2); font-size: 12.5px;
+    padding: 7px 10px; border-radius: 7px; cursor: pointer; border: 1px solid var(--border);
+    background: none; width: 100%; margin-bottom: 10px; transition: all 0.15s;
+  }
+  .back-btn:hover { background: var(--accent-light); color: var(--accent); border-color: var(--border2); }
+
+  /* ─── MAIN ─── */
+  .main { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; display: flex; flex-direction: column; }
+  .topbar {
+    background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 28px;
+    display: flex; align-items: center; gap: 16px; position: sticky; top: 0; z-index: 90;
+  }
+  .topbar-title { font-size: 17px; font-weight: 600; color: var(--text); flex: 1; }
+  .topbar-title span { color: var(--text3); font-weight: 400; font-size: 14px; }
+  .alert-chip {
+    display: flex; align-items: center; gap: 6px; background: var(--red-50);
+    color: var(--red-600); font-size: 12px; font-weight: 500; padding: 6px 12px;
+    border-radius: 20px; cursor: pointer; border: 1px solid var(--red-100); animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.7; } }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 600; }
+
+  .content { padding: 24px 28px; flex: 1; }
+
+  /* ─── PAGES ─── */
+  .page { display: none; }
+  .page.active { display: block; }
+  .page-header { margin-bottom: 24px; }
+  .page-header h1 { font-size: 22px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .page-header p { color: var(--text2); font-size: 14px; }
+
+  /* ─── STAT CARDS ─── */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: 18px 20px; display: flex; flex-direction: column; gap: 10px;
+  }
+  .stat-icon { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .stat-icon.green { background: var(--green-50); color: var(--green-600); }
+  .stat-icon.red { background: var(--red-50); color: var(--red-600); }
+  .stat-icon.amber { background: var(--amber-50); color: var(--amber-400); }
+  .stat-icon.teal { background: var(--teal-50); color: var(--teal-400); }
+  .stat-number { font-size: 26px; font-weight: 600; color: var(--text); font-family: var(--mono); }
+  .stat-label { font-size: 12px; color: var(--text3); font-weight: 400; }
+  .stat-change { font-size: 11px; margin-top: 2px; }
+  .stat-change.up { color: var(--green-600); } .stat-change.down { color: var(--red-600); }
+
+  /* ─── CARDS & PANELS ─── */
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: 20px 22px; margin-bottom: 18px;
+  }
+  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .card-title { font-size: 15px; font-weight: 600; color: var(--text); }
+  .card-sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+
+  /* ─── FORM ELEMENTS ─── */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group.full { grid-column: 1 / -1; }
+  label { font-size: 12.5px; font-weight: 500; color: var(--text2); }
+  input, select, textarea {
+    border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px;
+    font-family: var(--font); font-size: 13.5px; color: var(--text); background: var(--bg);
+    transition: border-color 0.15s, box-shadow 0.15s; outline: none; width: 100%;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59,109,17,0.12); background: var(--surface); }
+  textarea { resize: vertical; min-height: 80px; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px; padding: 9px 18px;
+    border-radius: 8px; font-size: 13.5px; font-weight: 500; cursor: pointer;
+    border: 1px solid transparent; transition: all 0.15s; font-family: var(--font);
+  }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-outline { background: none; border-color: var(--border2); color: var(--text2); }
+  .btn-outline:hover { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
+  .btn-danger { background: var(--red-400); color: white; }
+  .btn-danger:hover { background: var(--red-600); }
+  .btn-sm { padding: 5px 12px; font-size: 12px; }
+  .btn-ghost { background: none; border: none; color: var(--text2); }
+  .btn-ghost:hover { color: var(--accent); }
+  .btn-group { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+  /* ─── BADGES ─── */
+  .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 20px; }
+  .badge-green { background: var(--green-50); color: var(--green-800); }
+  .badge-red { background: var(--red-50); color: var(--red-600); }
+  .badge-amber { background: var(--amber-50); color: var(--amber-800); }
+  .badge-teal { background: var(--teal-50); color: var(--teal-800); }
+  .badge-gray { background: var(--gray-50); color: var(--gray-600); }
+  .blood-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; border-radius: 50%; background: var(--red-50);
+    color: var(--red-600); font-size: 12px; font-weight: 700; border: 2px solid var(--red-100);
+  }
+  .blood-badge.lg { width: 48px; height: 48px; font-size: 15px; }
+
+  /* ─── TABLE ─── */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th { text-align: left; font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  td { padding: 11px 12px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--bg); }
+
+  /* ─── BLOOD INVENTORY ─── */
+  .inventory-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; }
+  .blood-type-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: 16px; text-align: center; position: relative; overflow: hidden;
+    transition: all 0.2s;
+  }
+  .blood-type-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+  .blood-type-card.critical { border-color: var(--red-200); background: var(--red-50); }
+  .blood-type-card.low { border-color: #FAC775; background: var(--amber-50); }
+  .blood-type-card.ok { border-color: var(--green-100); }
+  .blood-type-label { font-size: 26px; font-weight: 700; color: var(--red-600); font-family: var(--mono); margin-bottom: 6px; }
+  .blood-type-units { font-size: 22px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .blood-type-sub { font-size: 11px; color: var(--text3); }
+  .progress-bar { height: 4px; border-radius: 2px; background: var(--border); margin: 10px 0 0; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 2px; transition: width 0.5s; }
+  .fill-ok { background: var(--green-400); }
+  .fill-low { background: var(--amber-400); }
+  .fill-critical { background: var(--red-400); }
+
+  /* ─── ALERTS ─── */
+  .alert-banner {
+    border-radius: var(--radius); padding: 14px 18px; margin-bottom: 14px;
+    display: flex; align-items: flex-start; gap: 12px; border: 1px solid;
+  }
+  .alert-banner.danger { background: var(--red-50); border-color: var(--red-100); }
+  .alert-banner.warning { background: var(--amber-50); border-color: #FAC775; }
+  .alert-banner.success { background: var(--green-50); border-color: var(--green-100); }
+  .alert-banner.info { background: var(--teal-50); border-color: var(--teal-100); }
+  .alert-icon { font-size: 16px; margin-top: 1px; flex-shrink: 0; }
+  .alert-banner.danger .alert-icon { color: var(--red-600); }
+  .alert-banner.warning .alert-icon { color: var(--amber-400); }
+  .alert-banner.success .alert-icon { color: var(--green-600); }
+  .alert-banner.info .alert-icon { color: var(--teal-400); }
+  .alert-body .title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+  .alert-banner.danger .alert-body .title { color: var(--red-800); }
+  .alert-banner.warning .alert-body .title { color: var(--amber-800); }
+  .alert-banner.success .alert-body .title { color: var(--green-800); }
+  .alert-banner.info .alert-body .title { color: var(--teal-800); }
+  .alert-body .desc { font-size: 12px; color: var(--text2); }
+  .alert-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+
+  /* ─── SEARCH BAR ─── */
+  .search-wrap { position: relative; }
+  .search-wrap i { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 14px; }
+  .search-wrap input { padding-left: 34px; }
+
+  /* ─── DONOR PROFILE CARD ─── */
+  .donor-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: 18px; display: flex; align-items: flex-start; gap: 14px; transition: box-shadow 0.2s;
+  }
+  .donor-card:hover { box-shadow: var(--shadow-md); }
+  .donor-avatar {
+    width: 48px; height: 48px; border-radius: 50%; background: var(--accent); color: white;
+    display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; flex-shrink: 0;
+  }
+  .donor-info { flex: 1; }
+  .donor-name { font-size: 14px; font-weight: 600; color: var(--text); }
+  .donor-meta { font-size: 12px; color: var(--text3); margin-top: 2px; }
+  .donor-tags { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+
+  /* ─── COMPATIBILITY TABLE ─── */
+  .compat-table td, .compat-table th { text-align: center; padding: 8px 10px; }
+  .compat-table th:first-child, .compat-table td:first-child { text-align: left; font-weight: 600; color: var(--text); }
+  .compat-yes { color: var(--green-600); font-weight: 600; font-size: 14px; }
+  .compat-no { color: var(--border); font-size: 14px; }
+  .compat-highlight { background: var(--accent-light); }
+
+  /* ─── TIMELINE ─── */
+  .timeline { list-style: none; position: relative; padding-left: 22px; }
+  .timeline::before { content: ''; position: absolute; left: 7px; top: 4px; bottom: 0; width: 2px; background: var(--border); border-radius: 1px; }
+  .timeline-item { position: relative; padding-bottom: 20px; }
+  .timeline-item::before { content: ''; position: absolute; left: -18px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); border: 2px solid var(--surface); }
+  .timeline-item.old::before { background: var(--border); }
+  .timeline-date { font-size: 11px; color: var(--text3); margin-bottom: 3px; }
+  .timeline-title { font-size: 13.5px; font-weight: 500; color: var(--text); }
+  .timeline-detail { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+  /* ─── MODAL ─── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+    z-index: 200; align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface); border-radius: var(--radius-xl); padding: 28px 28px 24px;
+    width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto;
+    box-shadow: var(--shadow-md); animation: modalIn 0.2s ease;
+  }
+  @keyframes modalIn { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .modal-title { font-size: 18px; font-weight: 600; }
+  .modal-close { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 18px; line-height: 1; padding: 4px; }
+  .modal-close:hover { color: var(--danger); }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--border); }
+
+  /* ─── TOAST ─── */
+  .toast-container { position: fixed; top: 20px; right: 20px; z-index: 500; display: flex; flex-direction: column; gap: 8px; }
+  .toast {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 12px 16px; display: flex; align-items: center; gap: 10px; font-size: 13.5px;
+    box-shadow: var(--shadow-md); animation: slideIn 0.3s ease; min-width: 280px;
+  }
+  @keyframes slideIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  .toast.out { animation: slideOut 0.3s ease forwards; }
+  @keyframes slideOut { to { transform: translateX(100px); opacity: 0; } }
+  .toast i.success { color: var(--green-600); } .toast i.danger { color: var(--red-600); }
+
+  /* ─── TABS ─── */
+  .tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+  .tab-btn {
+    padding: 9px 16px; font-size: 13px; font-weight: 500; color: var(--text3);
+    border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px;
+    transition: all 0.15s; font-family: var(--font);
+  }
+  .tab-btn:hover { color: var(--accent); }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ─── MISC ─── */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
+  .empty-state { text-align: center; padding: 48px 20px; color: var(--text3); }
+  .empty-state i { font-size: 40px; margin-bottom: 12px; display: block; opacity: 0.5; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 20px; background: var(--accent-light); color: var(--accent); font-size: 12px; font-weight: 500; }
+  .row { display: flex; gap: 14px; align-items: center; }
+  .row.between { justify-content: space-between; }
+  .row.end { justify-content: flex-end; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
+
+  @media (max-width: 900px) {
+    .two-col, .three-col, .form-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon"><i class="fas fa-droplet"></i></div>
+    <div class="brand-text">
+      <div class="name">Blood Donation</div>
+      <div class="sub">MediCare HMS Module</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-label">Overview</div>
+      <button class="nav-item active" onclick="navigate('dashboard')">
+        <i class="fas fa-gauge-high"></i> Dashboard
+      </button>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Donors</div>
+      <button class="nav-item" onclick="navigate('donors')">
+        <i class="fas fa-users"></i> Donor Registry
+      </button>
+      <button class="nav-item" onclick="navigate('register')">
+        <i class="fas fa-user-plus"></i> Register Donor
+      </button>
+      <button class="nav-item" onclick="navigate('search')">
+        <i class="fas fa-magnifying-glass"></i> Donor Search
+      </button>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Blood Bank</div>
+      <button class="nav-item" onclick="navigate('inventory')">
+        <i class="fas fa-boxes-stacked"></i> Inventory
+      </button>
+      <button class="nav-item" onclick="navigate('history')">
+        <i class="fas fa-clock-rotate-left"></i> Donation History
+      </button>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Alerts</div>
+      <button class="nav-item" onclick="navigate('alerts')">
+        <i class="fas fa-triangle-exclamation"></i> Emergency Alerts
+        <span class="nav-badge" id="alertBadge">3</span>
+      </button>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="back-btn" onclick="goBack()">
+      <i class="fas fa-arrow-left"></i> Back to HMS
+    </button>
+    <div>Logged in as <strong>Dr. Sharma</strong></div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <header class="topbar">
+    <div class="topbar-title" id="topbarTitle">Dashboard <span>/ Blood Donation</span></div>
+    <div class="alert-chip" onclick="navigate('alerts')">
+      <i class="fas fa-circle" style="font-size:7px; animation: pulse 1s infinite;"></i>
+      3 Emergency Alerts
+    </div>
+    <div class="avatar">DS</div>
+  </header>
+
+  <div class="content">
+
+    <!-- ═══════════════════════════════ DASHBOARD ═══════════════════════════════ -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <h1>Blood Donation Overview</h1>
+        <p>Today's summary — <span id="todayDate"></span></p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon green"><i class="fas fa-users"></i></div>
+          <div>
+            <div class="stat-number">1,284</div>
+            <div class="stat-label">Registered Donors</div>
+            <div class="stat-change up"><i class="fas fa-arrow-up" style="font-size:9px"></i> +12 this week</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon red"><i class="fas fa-droplet"></i></div>
+          <div>
+            <div class="stat-number">347</div>
+            <div class="stat-label">Units Available</div>
+            <div class="stat-change down"><i class="fas fa-arrow-down" style="font-size:9px"></i> −28 from yesterday</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon amber"><i class="fas fa-triangle-exclamation"></i></div>
+          <div>
+            <div class="stat-number">3</div>
+            <div class="stat-label">Critical Shortages</div>
+            <div class="stat-change down">O−, AB−, B−</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon teal"><i class="fas fa-calendar-check"></i></div>
+          <div>
+            <div class="stat-number">18</div>
+            <div class="stat-label">Donations Today</div>
+            <div class="stat-change up"><i class="fas fa-arrow-up" style="font-size:9px"></i> +5 from yesterday</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alerts summary -->
+      <div class="alert-banner danger">
+        <div class="alert-icon"><i class="fas fa-triangle-exclamation"></i></div>
+        <div class="alert-body">
+          <div class="title">Critical: O− blood type extremely low (2 units)</div>
+          <div class="desc">Immediate donors required. 3 patients currently waiting. Last donation received 4 days ago.</div>
+        </div>
+        <div class="alert-actions">
+          <button class="btn btn-danger btn-sm" onclick="navigate('alerts')">View All Alerts</button>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <!-- Recent Donations -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Recent Donations</div>
+              <div class="card-sub">Last 5 donations recorded</div>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="navigate('history')">View All</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Donor</th><th>Type</th><th>Units</th><th>Date</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Ravi Kumar</strong></td><td><span style="font-family:var(--mono);font-weight:700;color:var(--red-600)">A+</span></td><td>1</td><td>Today</td><td><span class="badge badge-green">Completed</span></td></tr>
+                <tr><td><strong>Priya Sharma</strong></td><td><span style="font-family:var(--mono);font-weight:700;color:var(--red-600)">O+</span></td><td>1</td><td>Today</td><td><span class="badge badge-green">Completed</span></td></tr>
+                <tr><td><strong>Amit Verma</strong></td><td><span style="font-family:var(--mono);font-weight:700;color:var(--red-600)">B+</span></td><td>1</td><td>Yesterday</td><td><span class="badge badge-teal">Processing</span></td></tr>
+                <tr><td><strong>Sunita Patel</strong></td><td><span style="font-family:var(--mono);font-weight:700;color:var(--red-600)">AB+</span></td><td>2</td><td>Yesterday</td><td><span class="badge badge-green">Completed</span></td></tr>
+                <tr><td><strong>Deepak Singh</strong></td><td><span style="font-family:var(--mono);font-weight:700;color:var(--red-600)">O−</span></td><td>1</td><td>3 days ago</td><td><span class="badge badge-green">Completed</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Quick Inventory -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Inventory Snapshot</div>
+              <div class="card-sub">Current blood bank stock</div>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="navigate('inventory')">Manage</button>
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;background:var(--bg)">
+              <div class="blood-badge">A+</div><div><div style="font-size:14px;font-weight:600">82 <span style="font-size:11px;color:var(--text3);font-weight:400">units</span></div><span class="badge badge-green" style="font-size:10px">Adequate</span></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;background:var(--bg)">
+              <div class="blood-badge">O+</div><div><div style="font-size:14px;font-weight:600">65 <span style="font-size:11px;color:var(--text3);font-weight:400">units</span></div><span class="badge badge-green" style="font-size:10px">Adequate</span></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;background:var(--amber-50)">
+              <div class="blood-badge">B+</div><div><div style="font-size:14px;font-weight:600">28 <span style="font-size:11px;color:var(--text3);font-weight:400">units</span></div><span class="badge badge-amber" style="font-size:10px">Low</span></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;background:var(--red-50)">
+              <div class="blood-badge">O−</div><div><div style="font-size:14px;font-weight:600">2 <span style="font-size:11px;color:var(--text3);font-weight:400">units</span></div><span class="badge badge-red" style="font-size:10px">Critical</span></div>
+            </div>
+          </div>
+          <div style="margin-top:10px;text-align:center">
+            <button class="btn btn-outline btn-sm" onclick="navigate('inventory')" style="width:100%">View Full Inventory <i class="fas fa-arrow-right" style="font-size:11px"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════ DONOR REGISTRY ═══════════════════════════════ -->
+    <div class="page" id="page-donors">
+      <div class="page-header">
+        <h1>Donor Registry</h1>
+        <p>All registered blood donors in the system</p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="row" style="gap:10px; flex:1">
+            <div class="search-wrap" style="flex:1;max-width:320px">
+              <i class="fas fa-magnifying-glass"></i>
+              <input type="text" placeholder="Search donors by name, ID, blood type..." id="donorSearch" oninput="filterDonors()">
+            </div>
+            <select id="bloodFilter" onchange="filterDonors()" style="width:130px">
+              <option value="">All Blood Types</option>
+              <option>A+</option><option>A−</option><option>B+</option><option>B−</option>
+              <option>AB+</option><option>AB−</option><option>O+</option><option>O−</option>
+            </select>
+            <select id="statusFilter" onchange="filterDonors()" style="width:120px">
+              <option value="">All Statuses</option>
+              <option>Active</option><option>Inactive</option><option>Deferred</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="navigate('register')">
+            <i class="fas fa-user-plus"></i> New Donor
+          </button>
+        </div>
+
+        <div class="table-wrap">
+          <table id="donorTable">
+            <thead>
+              <tr><th>ID</th><th>Name</th><th>Blood Type</th><th>Age</th><th>Phone</th><th>Last Donated</th><th>Total Donations</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="donorTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════ REGISTER DONOR ═══════════════════════════════ -->
+    <div class="page" id="page-register">
+      <div class="page-header">
+        <h1>Register New Donor</h1>
+        <p>Add a new blood donor to the system</p>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title"><i class="fas fa-circle-info" style="color:var(--teal-400)"></i> Personal Information</div></div>
+        <div class="form-grid">
+          <div class="form-group"><label>First Name *</label><input type="text" id="reg_fname" placeholder="Ravi"></div>
+          <div class="form-group"><label>Last Name *</label><input type="text" id="reg_lname" placeholder="Kumar"></div>
+          <div class="form-group"><label>Date of Birth *</label><input type="date" id="reg_dob"></div>
+          <div class="form-group"><label>Gender *</label>
+            <select id="reg_gender"><option>Male</option><option>Female</option><option>Other</option></select>
+          </div>
+          <div class="form-group"><label>Phone Number *</label><input type="tel" id="reg_phone" placeholder="+91 9XXXXXXXXX"></div>
+          <div class="form-group"><label>Email</label><input type="email" id="reg_email" placeholder="ravi@example.com"></div>
+          <div class="form-group full"><label>Address</label><textarea id="reg_address" placeholder="Street, City, State, PIN"></textarea></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title"><i class="fas fa-droplet" style="color:var(--red-400)"></i> Medical Information</div></div>
+        <div class="form-grid">
+          <div class="form-group"><label>Blood Type *</label>
+            <select id="reg_blood">
+              <option>A+</option><option>A−</option><option>B+</option><option>B−</option>
+              <option>AB+</option><option>AB−</option><option>O+</option><option>O−</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Weight (kg)</label><input type="number" id="reg_weight" placeholder="65" min="45"></div>
+          <div class="form-group"><label>Last Hemoglobin (g/dL)</label><input type="number" step="0.1" id="reg_hb" placeholder="13.5"></div>
+          <div class="form-group"><label>Eligible to Donate</label>
+            <select id="reg_eligible"><option>Yes</option><option>No</option><option>Deferred</option></select>
+          </div>
+          <div class="form-group full"><label>Medical Notes / Conditions</label><textarea id="reg_notes" placeholder="Any relevant medical history, medications, recent illness..."></textarea></div>
+        </div>
+      </div>
+
+      <div class="row end" style="gap:10px">
+        <button class="btn btn-outline" onclick="navigate('donors')">Cancel</button>
+        <button class="btn btn-primary" onclick="registerDonor()"><i class="fas fa-check"></i> Register Donor</button>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════ DONOR SEARCH ═══════════════════════════════ -->
+    <div class="page" id="page-search">
+      <div class="page-header">
+        <h1>Donor Search & Compatibility</h1>
+        <p>Find compatible donors based on blood type compatibility</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title" style="margin-bottom:14px">Find Compatible Donors</div>
+        <div class="row" style="gap:12px; flex-wrap:wrap">
+          <div class="form-group" style="flex:1;min-width:180px">
+            <label>Patient's Blood Type (required)</label>
+            <select id="searchBlood" onchange="searchDonors()">
+              <option value="">Select blood type...</option>
+              <option>A+</option><option>A−</option><option>B+</option><option>B−</option>
+              <option>AB+</option><option>AB−</option><option>O+</option><option>O−</option>
+            </select>
+          </div>
+          <div class="form-group" style="flex:1;min-width:180px">
+            <label>Units Needed</label>
+            <input type="number" id="searchUnits" value="1" min="1" placeholder="1">
+          </div>
+          <div class="form-group" style="flex:1;min-width:180px">
+            <label>Urgency</label>
+            <select id="searchUrgency">
+              <option>Standard</option><option>Urgent (24h)</option><option>Emergency (now)</option>
+            </select>
+          </div>
+          <div style="align-self:flex-end">
+            <button class="btn btn-primary" onclick="searchDonors()"><i class="fas fa-magnifying-glass"></i> Search</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Compatibility chart -->
+      <div class="card">
+        <div class="card-title" style="margin-bottom:14px">Blood Type Compatibility Reference</div>
+        <div class="table-wrap">
+          <table class="compat-table">
+            <thead>
+              <tr>
+                <th>Recipient ↓ / Donor →</th>
+                <th>O−</th><th>O+</th><th>A−</th><th>A+</th><th>B−</th><th>B+</th><th>AB−</th><th>AB+</th>
+              </tr>
+            </thead>
+            <tbody id="compatBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" id="searchResults" style="display:none">
+        <div class="card-header">
+          <div class="card-title" id="searchResultTitle">Compatible Donors Found</div>
+          <div id="searchResultCount"></div>
+        </div>
+        <div id="searchResultsList" style="display:grid;grid-template-columns:1fr 1fr;gap:12px"></div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════ INVENTORY ═══════════════════════════════ -->
+    <div class="page" id="page-inventory">
+      <div class="page-header">
+        <h1>Blood Bank Inventory</h1>
+        <p>Monitor and manage blood unit stock levels</p>
+      </div>
+
+      <div class="inventory-grid" id="inventoryGrid"></div>
+
+      <div class="two-col" style="margin-top:18px">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Add Blood Units</div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group"><label>Blood Type</label>
+              <select id="inv_type">
+                <option>A+</option><option>A−</option><option>B+</option><option>B−</option>
+                <option>AB+</option><option>AB−</option><option>O+</option><option>O−</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Units to Add</label><input type="number" id="inv_units" value="1" min="1"></div>
+            <div class="form-group"><label>Donor ID / Source</label><input type="text" id="inv_source" placeholder="DNR-001 or Walk-in"></div>
+            <div class="form-group"><label>Collection Date</label><input type="date" id="inv_date"></div>
+            <div class="form-group"><label>Expiry Date</label><input type="date" id="inv_expiry"></div>
+            <div class="form-group"><label>Bag ID / Label</label><input type="text" id="inv_bag" placeholder="BAG-2024-XXXX"></div>
+          </div>
+          <div class="row end" style="margin-top:14px">
+            <button class="btn btn-primary" onclick="addInventory()"><i class="fas fa-plus"></i> Add Units</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Issue Blood Units</div></div>
+          <div class="form-grid">
+            <div class="form-group"><label>Blood Type</label>
+              <select id="issue_type">
+                <option>A+</option><option>A−</option><option>B+</option><option>B−</option>
+                <option>AB+</option><option>AB−</option><option>O+</option><option>O−</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Units to Issue</label><input type="number" id="issue_units" value="1" min="1"></div>
+            <div class="form-group"><label>Patient ID</label><input type="text" id="issue_patient" placeholder="PAT-XXXX"></div>
+            <div class="form-group"><label>Ward / Department</label>
+              <select id="issue_ward">
+                <option>Emergency</option><option>Surgery</option><option>ICU</option>
+                <option>Maternity</option><option>Oncology</option><option>General</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Authorized By (Doctor)</label><input type="text" id="issue_doc" placeholder="Dr. Name"></div>
+            <div class="form-group"><label>Reason</label>
+              <select id="issue_reason">
+                <option>Surgery</option><option>Trauma</option><option>Anemia</option>
+                <option>Cancer treatment</option><option>Childbirth</option><option>Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="row end" style="margin-top:14px">
+            <button class="btn btn-danger" onclick="issueBlood()"><i class="fas fa-arrow-right-from-bracket"></i> Issue Units</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════ HISTORY ═══════════════════════════════ -->
+    <div class="page" id="page-history">
+      <div class="page-header">
+        <h1>Donation History & Reports</h1>
+        <p>Complete log of all donation and transfusion events</p>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('donations')">All Donations</button>
+        <button class="tab-btn" onclick="switchTab('transfusions')">Transfusions Issued</button>
+        <button class="tab-btn" onclick="switchTab('reports')">Monthly Report</button>
+      </div>
+
+      <div class="tab-panel active" id="tab-donations">
+        <div class="card">
+          <div class="card-header">
+            <div class="search-wrap" style="width:260px">
+              <i class="fas fa-magnifying-glass"></i>
+              <input type="text" placeholder="Search by donor, type, date...">
+            </div>
+            <button class="btn btn-outline btn-sm"><i class="fas fa-download"></i> Export CSV</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Donation ID</th><th>Donor</th><th>Blood Type</th><th>Units</th><th>Date</th><th>Hemoglobin</th><th>Status</th><th>Notes</th></tr></thead>
+              <tbody id="historyBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="tab-transfusions">
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Issue ID</th><th>Patient ID</th><th>Blood Type</th><th>Units</th><th>Date</th><th>Ward</th><th>Doctor</th><th>Reason</th></tr></thead>
+              <tbody>
+                <tr><td><span style="font-family:var(--mono);font-size:12px">ISS-0041</span></td><td>PAT-3872</td><td><b style="color:var(--red-600)">A+</b></td><td>2</td><td>Today, 09:30</td><td>Surgery</td><td>Dr. Mehta</td><td>Cardiac op.</td></tr>
+                <tr><td><span style="font-family:var(--mono);font-size:12px">ISS-0040</span></td><td>PAT-2941</td><td><b style="color:var(--red-600)">O+</b></td><td>1</td><td>Yesterday</td><td>Emergency</td><td>Dr. Kapoor</td><td>Trauma</td></tr>
+                <tr><td><span style="font-family:var(--mono);font-size:12px">ISS-0039</span></td><td>PAT-4100</td><td><b style="color:var(--red-600)">B+</b></td><td>1</td><td>2 days ago</td><td>ICU</td><td>Dr. Sharma</td><td>Anemia</td></tr>
+                <tr><td><span style="font-family:var(--mono);font-size:12px">ISS-0038</span></td><td>PAT-1590</td><td><b style="color:var(--red-600)">AB+</b></td><td>3</td><td>3 days ago</td><td>Oncology</td><td>Dr. Nair</td><td>Cancer treatment</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="tab-reports">
+        <div class="three-col">
+          <div class="stat-card"><div class="stat-icon green"><i class="fas fa-droplet"></i></div><div><div class="stat-number">284</div><div class="stat-label">Units Donated (Month)</div></div></div>
+          <div class="stat-card"><div class="stat-icon red"><i class="fas fa-syringe"></i></div><div><div class="stat-number">196</div><div class="stat-label">Units Transfused</div></div></div>
+          <div class="stat-card"><div class="stat-icon teal"><i class="fas fa-boxes-stacked"></i></div><div><div class="stat-number">88</div><div class="stat-label">Net Increase</div></div></div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:14px">Monthly Blood Type Breakdown</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Blood Type</th><th>Units Collected</th><th>Units Issued</th><th>Expiry Discarded</th><th>Net Stock Change</th></tr></thead>
+              <tbody>
+                <tr><td><b style="color:var(--red-600)">A+</b></td><td>72</td><td>58</td><td>2</td><td><span class="badge badge-green">+12</span></td></tr>
+                <tr><td><b style="color:var(--red-600)">O+</b></td><td>68</td><td>54</td><td>1</td><td><span class="badge badge-green">+13</span></td></tr>
+                <tr><td><b style="color:var(--red-600)">B+</b></td><td>41</td><td>38</td><td>0</td><td><span class="badge badge-green">+3</span></td></tr>
+                <tr><td><b style="color:var(--red-600)">AB+</b></td><td>29</td><td>22</td><td>1</td><td><span class="badge badge-green">+6</span></td></tr>
+                <tr><td><b style="color:var(--red-600)">O−</b></td><td>18</td><td>16</td><td>0</td><td><span class="badge badge-amber">+2</span></td></tr>
+                <tr><td><b style="color:var(--red-600)">A−</b></td><td>22</td><td>4</td><td>0</td><td><span class="badge badge-green">+18</span></td></tr>
+                <tr><td><b style="color:var(--red-600)">B−</b></td><td>14</td><td>4</td><td>0</td><td><span class="badge badge-green">+10</span></td></tr>
+                <tr><td><b style="color:var(--red-600)">AB−</b></td><td>20</td><td>0</td><td>0</td><td><span class="badge badge-green">+20</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════ ALERTS ═══════════════════════════════ -->
+    <div class="page" id="page-alerts">
+      <div class="page-header">
+        <h1>Emergency Blood Alerts</h1>
+        <p>Critical shortages and urgent blood requests</p>
+      </div>
+
+      <div class="row between" style="margin-bottom:16px">
+        <div class="chip"><i class="fas fa-circle" style="font-size:8px;color:var(--red-600)"></i> 3 Active Alerts</div>
+        <button class="btn btn-outline btn-sm" onclick="openAlertModal()"><i class="fas fa-plus"></i> Create Alert</button>
+      </div>
+
+      <div id="alertsList">
+        <div class="alert-banner danger">
+          <div class="alert-icon"><i class="fas fa-droplet"></i></div>
+          <div class="alert-body">
+            <div class="title">CRITICAL — O− Stock Depleted (2 units remaining)</div>
+            <div class="desc">3 patients currently on the waitlist requiring O− blood. Last collection: 4 days ago. Universal donor — all patients may need this type.</div>
+            <div style="margin-top:8px;display:flex;gap:8px">
+              <span class="badge badge-red">Critical</span>
+              <span class="badge badge-gray">Raised: Today 06:00 AM</span>
+            </div>
+          </div>
+          <div class="alert-actions" style="flex-direction:column;gap:6px">
+            <button class="btn btn-danger btn-sm" onclick="showToast('Emergency SMS sent to 24 O− donors','success')"><i class="fas fa-paper-plane"></i> Notify Donors</button>
+            <button class="btn btn-outline btn-sm" onclick="resolveAlert(this)">Resolve</button>
+          </div>
+        </div>
+
+        <div class="alert-banner warning">
+          <div class="alert-icon"><i class="fas fa-triangle-exclamation"></i></div>
+          <div class="alert-body">
+            <div class="title">LOW — AB− Stock (6 units, 2-day supply)</div>
+            <div class="desc">AB− stock predicted to last only 2 more days at current usage rate. Scheduled surgeries this week may be at risk.</div>
+            <div style="margin-top:8px;display:flex;gap:8px">
+              <span class="badge badge-amber">Warning</span>
+              <span class="badge badge-gray">Raised: Yesterday 2:00 PM</span>
+            </div>
+          </div>
+          <div class="alert-actions" style="flex-direction:column;gap:6px">
+            <button class="btn btn-primary btn-sm" onclick="showToast('Notification sent to AB− donors','success')"><i class="fas fa-paper-plane"></i> Notify Donors</button>
+            <button class="btn btn-outline btn-sm" onclick="resolveAlert(this)">Resolve</button>
+          </div>
+        </div>
+
+        <div class="alert-banner warning">
+          <div class="alert-icon"><i class="fas fa-triangle-exclamation"></i></div>
+          <div class="alert-body">
+            <div class="title">LOW — B− Stock (8 units, 3-day supply)</div>
+            <div class="desc">B− showing declining trend. 2 planned surgeries scheduled for next week requiring B−. Stock may not be sufficient.</div>
+            <div style="margin-top:8px;display:flex;gap:8px">
+              <span class="badge badge-amber">Warning</span>
+              <span class="badge badge-gray">Raised: 2 days ago</span>
+            </div>
+          </div>
+          <div class="alert-actions" style="flex-direction:column;gap:6px">
+            <button class="btn btn-primary btn-sm" onclick="showToast('Notification sent to B− donors','success')"><i class="fas fa-paper-plane"></i> Notify Donors</button>
+            <button class="btn btn-outline btn-sm" onclick="resolveAlert(this)">Resolve</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:8px">
+        <div class="card-title" style="margin-bottom:14px"><i class="fas fa-check-circle" style="color:var(--green-600)"></i> Recently Resolved Alerts</div>
+        <div class="alert-banner success" style="opacity:0.8">
+          <div class="alert-icon"><i class="fas fa-check-circle"></i></div>
+          <div class="alert-body">
+            <div class="title">RESOLVED — A+ shortage (Was: 12 units)</div>
+            <div class="desc">Stock replenished to 82 units after successful donor drive on 2 May 2026.</div>
+          </div>
+          <div class="alert-actions"><span class="badge badge-green">Resolved</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- CREATE ALERT MODAL -->
+<div class="modal-overlay" id="alertModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fas fa-triangle-exclamation" style="color:var(--warning)"></i> Create Emergency Alert</div>
+      <button class="modal-close" onclick="closeModal('alertModal')"><i class="fas fa-xmark"></i></button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label>Blood Type</label>
+        <select id="alert_type">
+          <option>A+</option><option>A−</option><option>B+</option><option>B−</option>
+          <option>AB+</option><option>AB−</option><option>O+</option><option>O−</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Severity</label>
+        <select id="alert_sev"><option>Warning</option><option>Critical</option></select>
+      </div>
+      <div class="form-group full"><label>Alert Message</label>
+        <textarea id="alert_msg" placeholder="Describe the urgency and situation..."></textarea>
+      </div>
+      <div class="form-group"><label>Notify Via</label>
+        <select id="alert_notify"><option>SMS + Email</option><option>SMS only</option><option>Email only</option><option>System only</option></select>
+      </div>
+      <div class="form-group"><label>Units Required</label>
+        <input type="number" id="alert_units" placeholder="10" min="1">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('alertModal')">Cancel</button>
+      <button class="btn btn-danger" onclick="createAlert()"><i class="fas fa-paper-plane"></i> Publish Alert</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────
+const donors = [
+  {id:'DNR-001',name:'Ravi Kumar',blood:'A+',age:32,phone:'9876543210',lastDonated:'Today',total:8,status:'Active'},
+  {id:'DNR-002',name:'Priya Sharma',blood:'O+',age:27,phone:'9123456780',lastDonated:'Today',total:12,status:'Active'},
+  {id:'DNR-003',name:'Amit Verma',blood:'B+',age:45,phone:'9988776655',lastDonated:'Yesterday',total:5,status:'Active'},
+  {id:'DNR-004',name:'Sunita Patel',blood:'AB+',age:38,phone:'9001122334',lastDonated:'3 days ago',total:3,status:'Active'},
+  {id:'DNR-005',name:'Deepak Singh',blood:'O−',age:29,phone:'8877665544',lastDonated:'5 days ago',total:15,status:'Active'},
+  {id:'DNR-006',name:'Meena Joshi',blood:'A−',age:52,phone:'9765432100',lastDonated:'2 weeks ago',total:22,status:'Active'},
+  {id:'DNR-007',name:'Vikram Rao',blood:'B−',age:41,phone:'9345678901',lastDonated:'1 month ago',total:7,status:'Active'},
+  {id:'DNR-008',name:'Anita Nair',blood:'AB−',age:35,phone:'8001234567',lastDonated:'2 months ago',total:4,status:'Inactive'},
+  {id:'DNR-009',name:'Suresh Iyer',blood:'O+',age:23,phone:'9898989898',lastDonated:'Never',total:0,status:'Active'},
+  {id:'DNR-010',name:'Lakshmi Devi',blood:'A+',age:44,phone:'9711223344',lastDonated:'3 months ago',total:9,status:'Deferred'},
+];
+
+const inventory = [
+  {type:'A+', units:82, max:100},
+  {type:'A−', units:38, max:80},
+  {type:'B+', units:28, max:80},
+  {type:'B−', units:8, max:60},
+  {type:'AB+', units:45, max:60},
+  {type:'AB−', units:6, max:40},
+  {type:'O+', units:65, max:120},
+  {type:'O−', units:2, max:100},
+];
+
+const historyData = [
+  {id:'DON-1041',donor:'Ravi Kumar',blood:'A+',units:1,date:'Today, 10:30',hb:'14.2',status:'Completed',notes:''},
+  {id:'DON-1040',donor:'Priya Sharma',blood:'O+',units:1,date:'Today, 09:15',hb:'13.8',status:'Completed',notes:''},
+  {id:'DON-1039',donor:'Amit Verma',blood:'B+',units:1,date:'Yesterday',hb:'13.1',status:'Processing',notes:'Mild dizziness post'},
+  {id:'DON-1038',donor:'Sunita Patel',blood:'AB+',units:2,date:'Yesterday',hb:'14.6',status:'Completed',notes:''},
+  {id:'DON-1037',donor:'Deepak Singh',blood:'O−',units:1,date:'3 days ago',hb:'15.1',status:'Completed',notes:'Universal donor'},
+  {id:'DON-1036',donor:'Meena Joshi',blood:'A−',units:1,date:'2 weeks ago',hb:'13.4',status:'Completed',notes:''},
+  {id:'DON-1035',donor:'Vikram Rao',blood:'B−',units:1,date:'1 month ago',hb:'14.0',status:'Completed',notes:''},
+];
+
+// Compatibility: who can donate to whom
+const compatibility = {
+  'O−': ['O−','O+','A−','A+','B−','B+','AB−','AB+'],
+  'O+': ['O+','A+','B+','AB+'],
+  'A−': ['A−','A+','AB−','AB+'],
+  'A+': ['A+','AB+'],
+  'B−': ['B−','B+','AB−','AB+'],
+  'B+': ['B+','AB+'],
+  'AB−': ['AB−','AB+'],
+  'AB+': ['AB+'],
+};
+
+// who can patient receive from
+const canReceiveFrom = {
+  'A+':  ['O−','O+','A−','A+'],
+  'A−':  ['O−','A−'],
+  'B+':  ['O−','O+','B−','B+'],
+  'B−':  ['O−','B−'],
+  'AB+': ['O−','O+','A−','A+','B−','B+','AB−','AB+'],
+  'AB−': ['O−','A−','B−','AB−'],
+  'O+':  ['O−','O+'],
+  'O−':  ['O−'],
+};
+
+// ── NAVIGATION ───────────────────────────────────────
+function navigate(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if(n.onclick && n.onclick.toString().includes("'"+page+"'")) n.classList.add('active');
+  });
+  const titles = {dashboard:'Dashboard',donors:'Donor Registry',register:'Register Donor',search:'Donor Search',inventory:'Inventory',history:'History & Reports',alerts:'Emergency Alerts'};
+  document.getElementById('topbarTitle').innerHTML = (titles[page]||page) + ' <span>/ Blood Donation</span>';
+}
+
+function goBack() {
+  showToast('Returning to Hospital Management System','success');
+  setTimeout(() => window.history.back(), 1000);
+}
+
+// ── INIT ─────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('inv_date').value = new Date().toISOString().split('T')[0];
+  const expiry = new Date(); expiry.setDate(expiry.getDate()+42);
+  document.getElementById('inv_expiry').value = expiry.toISOString().split('T')[0];
+  renderDonors(donors);
+  renderInventory();
+  renderHistory();
+  buildCompatTable();
+});
+
+// ── DONORS ───────────────────────────────────────────
+function renderDonors(list) {
+  const tb = document.getElementById('donorTableBody');
+  tb.innerHTML = list.map(d => `
+    <tr>
+      <td><span style="font-family:var(--mono);font-size:12px;color:var(--text3)">${d.id}</span></td>
+      <td><strong>${d.name}</strong></td>
+      <td><span style="font-family:var(--mono);font-weight:700;color:var(--red-600)">${d.blood}</span></td>
+      <td>${d.age}</td>
+      <td style="font-family:var(--mono);font-size:12px">${d.phone}</td>
+      <td>${d.lastDonated}</td>
+      <td>${d.total}</td>
+      <td><span class="badge ${d.status==='Active'?'badge-green':d.status==='Deferred'?'badge-amber':'badge-gray'}">${d.status}</span></td>
+      <td>
+        <button class="btn btn-ghost btn-sm" title="View profile" onclick="viewDonorProfile('${d.id}')"><i class="fas fa-eye"></i></button>
+        <button class="btn btn-ghost btn-sm" title="Edit" onclick="showToast('Edit donor coming soon','success')"><i class="fas fa-pen"></i></button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function filterDonors() {
+  const q = document.getElementById('donorSearch').value.toLowerCase();
+  const bt = document.getElementById('bloodFilter').value;
+  const st = document.getElementById('statusFilter').value;
+  renderDonors(donors.filter(d =>
+    (!q || d.name.toLowerCase().includes(q) || d.id.toLowerCase().includes(q) || d.blood.toLowerCase().includes(q)) &&
+    (!bt || d.blood === bt) &&
+    (!st || d.status === st)
+  ));
+}
+
+function viewDonorProfile(id) {
+  const d = donors.find(x => x.id===id);
+  if(!d) return;
+  showToast(`Viewing profile: ${d.name} (${d.blood})`, 'success');
+}
+
+function registerDonor() {
+  const fn = document.getElementById('reg_fname').value.trim();
+  const ln = document.getElementById('reg_lname').value.trim();
+  const ph = document.getElementById('reg_phone').value.trim();
+  if(!fn||!ln||!ph) { showToast('Please fill all required fields','danger'); return; }
+  const newId = 'DNR-' + String(donors.length+1).padStart(3,'0');
+  const bt = document.getElementById('reg_blood').value;
+  donors.unshift({id:newId,name:fn+' '+ln,blood:bt,age:'-',phone:ph,lastDonated:'Never',total:0,status:'Active'});
+  showToast(`Donor ${fn} ${ln} registered successfully!`, 'success');
+  ['reg_fname','reg_lname','reg_phone','reg_email','reg_address','reg_weight','reg_hb','reg_notes'].forEach(id => document.getElementById(id).value='');
+  navigate('donors');
+}
+
+// ── INVENTORY ─────────────────────────────────────────
+function renderInventory() {
+  const grid = document.getElementById('inventoryGrid');
+  grid.innerHTML = inventory.map(b => {
+    const pct = Math.min(100, Math.round((b.units/b.max)*100));
+    const cls = b.units<=5 ? 'critical' : b.units<=20 ? 'low' : 'ok';
+    const fillCls = b.units<=5 ? 'fill-critical' : b.units<=20 ? 'fill-low' : 'fill-ok';
+    const badgeCls = b.units<=5 ? 'badge-red' : b.units<=20 ? 'badge-amber' : 'badge-green';
+    const badgeLbl = b.units<=5 ? 'Critical' : b.units<=20 ? 'Low' : 'Adequate';
+    return `<div class="blood-type-card ${cls}">
+      <div class="blood-type-label">${b.type}</div>
+      <div class="blood-type-units">${b.units}</div>
+      <div class="blood-type-sub">units available</div>
+      <span class="badge ${badgeCls}" style="margin:6px auto 0;display:inline-flex">${badgeLbl}</span>
+      <div class="progress-bar"><div class="progress-fill ${fillCls}" style="width:${pct}%"></div></div>
+      <div style="font-size:10px;color:var(--text3);margin-top:4px">${pct}% of capacity</div>
+    </div>`;
+  }).join('');
+}
+
+function addInventory() {
+  const type = document.getElementById('inv_type').value;
+  const units = parseInt(document.getElementById('inv_units').value)||0;
+  if(units<=0){showToast('Enter valid unit count','danger');return;}
+  const inv = inventory.find(x=>x.type===type);
+  if(inv) inv.units = Math.min(inv.max, inv.units+units);
+  renderInventory();
+  showToast(`${units} unit(s) of ${type} added to inventory`,'success');
+}
+
+function issueBlood() {
+  const type = document.getElementById('issue_type').value;
+  const units = parseInt(document.getElementById('issue_units').value)||0;
+  const patient = document.getElementById('issue_patient').value.trim();
+  if(!patient){showToast('Enter patient ID','danger');return;}
+  if(units<=0){showToast('Enter valid unit count','danger');return;}
+  const inv = inventory.find(x=>x.type===type);
+  if(!inv||inv.units<units){showToast(`Insufficient ${type} units in stock!`,'danger');return;}
+  inv.units -= units;
+  renderInventory();
+  showToast(`${units} unit(s) of ${type} issued to ${patient}`,'success');
+}
+
+// ── HISTORY ───────────────────────────────────────────
+function renderHistory() {
+  const tb = document.getElementById('historyBody');
+  tb.innerHTML = historyData.map(h => `
+    <tr>
+      <td><span style="font-family:var(--mono);font-size:12px">${h.id}</span></td>
+      <td>${h.donor}</td>
+      <td><b style="color:var(--red-600)">${h.blood}</b></td>
+      <td>${h.units}</td>
+      <td>${h.date}</td>
+      <td>${h.hb} g/dL</td>
+      <td><span class="badge ${h.status==='Completed'?'badge-green':'badge-teal'}">${h.status}</span></td>
+      <td style="font-size:12px;color:var(--text3)">${h.notes||'—'}</td>
+    </tr>
+  `).join('');
+}
+
+// ── SEARCH / COMPATIBILITY ────────────────────────────
+function buildCompatTable() {
+  const types = ['O−','O+','A−','A+','B−','B+','AB−','AB+'];
+  const tb = document.getElementById('compatBody');
+  tb.innerHTML = types.map(recipient => {
+    const donors = canReceiveFrom[recipient]||[];
+    return `<tr>${['recipient',...types].map((t,i) => i===0
+      ? `<td><b style="color:var(--red-600)">${recipient}</b></td>`
+      : `<td class="${donors.includes(t)?'compat-highlight':''}">${donors.includes(t) ? '<span class="compat-yes">✓</span>' : '<span class="compat-no">·</span>'}</td>`
+    ).join('')}</tr>`;
+  }).join('');
+}
+
+function searchDonors() {
+  const bt = document.getElementById('searchBlood').value;
+  if(!bt) return;
+  const compatible = canReceiveFrom[bt]||[];
+  const matches = donors.filter(d => compatible.includes(d.blood) && d.status==='Active');
+  const resultsEl = document.getElementById('searchResults');
+  const listEl = document.getElementById('searchResultsList');
+  const titleEl = document.getElementById('searchResultTitle');
+  const countEl = document.getElementById('searchResultCount');
+  resultsEl.style.display='block';
+  titleEl.textContent = `Compatible Donors for ${bt} Patient`;
+  countEl.innerHTML = `<span class="badge badge-green">${matches.length} donors found</span>`;
+  listEl.innerHTML = matches.length ? matches.map(d => `
+    <div class="donor-card">
+      <div class="donor-avatar">${d.name.split(' ').map(x=>x[0]).join('')}</div>
+      <div class="donor-info">
+        <div class="donor-name">${d.name}</div>
+        <div class="donor-meta">${d.id} · Age ${d.age} · ${d.phone}</div>
+        <div class="donor-tags">
+          <span class="badge badge-red">${d.blood}</span>
+          <span class="badge badge-green">${d.status}</span>
+          <span class="badge badge-gray">Last: ${d.lastDonated}</span>
+        </div>
+      </div>
+      <button class="btn btn-outline btn-sm" style="flex-shrink:0" onclick="showToast('SMS sent to ${d.name}','success')"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  `).join('') : '<div class="empty-state"><i class="fas fa-users-slash"></i><p>No active compatible donors found</p></div>';
+}
+
+// ── ALERTS ────────────────────────────────────────────
+function resolveAlert(btn) {
+  const alertEl = btn.closest('.alert-banner');
+  alertEl.style.transition='opacity 0.4s';
+  alertEl.style.opacity='0';
+  setTimeout(()=>alertEl.remove(), 400);
+  const badge = document.getElementById('alertBadge');
+  const n = parseInt(badge.textContent)-1;
+  badge.textContent = n>0?n:'0';
+  if(n<=0) badge.style.display='none';
+  showToast('Alert resolved','success');
+}
+
+function openAlertModal() { document.getElementById('alertModal').classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function createAlert() {
+  const type = document.getElementById('alert_type').value;
+  const sev = document.getElementById('alert_sev').value;
+  const msg = document.getElementById('alert_msg').value.trim();
+  if(!msg){showToast('Enter alert message','danger');return;}
+  const cls = sev==='Critical'?'danger':'warning';
+  const icon = sev==='Critical'?'droplet':'triangle-exclamation';
+  const badgeCls = sev==='Critical'?'badge-red':'badge-amber';
+  const newAlert = document.createElement('div');
+  newAlert.className = `alert-banner ${cls}`;
+  newAlert.innerHTML = `
+    <div class="alert-icon"><i class="fas fa-${icon}"></i></div>
+    <div class="alert-body">
+      <div class="title">${sev.toUpperCase()} — ${type} : ${msg}</div>
+      <div class="desc">Raised just now</div>
+      <div style="margin-top:8px"><span class="badge ${badgeCls}">${sev}</span></div>
+    </div>
+    <div class="alert-actions" style="flex-direction:column;gap:6px">
+      <button class="btn btn-primary btn-sm" onclick="showToast('Donors notified','success')"><i class="fas fa-paper-plane"></i> Notify</button>
+      <button class="btn btn-outline btn-sm" onclick="resolveAlert(this)">Resolve</button>
+    </div>`;
+  document.getElementById('alertsList').prepend(newAlert);
+  const badge = document.getElementById('alertBadge');
+  badge.textContent = parseInt(badge.textContent)+1;
+  badge.style.display='';
+  closeModal('alertModal');
+  showToast(`Alert created for ${type} (${sev})`,'success');
+}
+
+// ── TABS ─────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', b.onclick.toString().includes("'"+name+"'")));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id==='tab-'+name));
+}
+
+// ── TOAST ─────────────────────────────────────────────
+function showToast(msg, type='success') {
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.innerHTML = `<i class="fas ${type==='success'?'fa-circle-check':'fa-circle-xmark'} ${type}"></i> ${msg}`;
+  c.appendChild(t);
+  setTimeout(()=>{ t.classList.add('out'); setTimeout(()=>t.remove(),300); }, 3000);
+}
+
+// close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open'); }));
+</script>
+</body>
+</html>
